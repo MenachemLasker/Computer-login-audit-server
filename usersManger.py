@@ -27,7 +27,7 @@ def rcv_username(client_socket):
 
 def new_user(id_a, username, hashed_pass):
     the_new_user = {
-        str(id_a): username
+        str(id_a): str(username)
     }
     file = 'users.json'
     if has_file(file):
@@ -39,7 +39,7 @@ def new_user(id_a, username, hashed_pass):
     with open(file, 'w') as outfile:
         json.dump(users, outfile)
     new_user_and_pass = {
-        username: hashed_pass
+        str(username): str(hashed_pass)
     }
     file = 'usersPass.json'
     if has_file(file):
@@ -63,3 +63,11 @@ def get_username(id_a):
 def ensure_directory(directory_name):
     if not os.path.exists(directory_name):
         os.makedirs(directory_name)
+
+def verify_user(username, password):
+    file = 'usersPass.json'
+    if has_file(file):
+        with open(file, 'r') as infile:
+            users_and_pass = json.load(infile)
+            return users_and_pass[username] == password
+    return False

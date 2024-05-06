@@ -18,12 +18,15 @@ def get_correct_username(message):
     try:
         chat_id = message.chat.id
         username = message.text
-#שגיאה לא מוסיף לרשימה אם רשמת שם משתמש לא נכון
-        if not has_user(username):
+        if has_user(username):
+            msg = bot.reply_to(message, "אנא הזן סיסמה:")
+            if verify_user(username, msg):
+                follow_user(username, chat_id)
+            else:
+                bot.send_message(chat_id, "err")
+        else:
             msg = bot.reply_to(message, "שם המשתמש לא קיים, אנא נסה שוב:")
             bot.register_next_step_handler(msg, get_correct_username)
-        else:
-            bot.register_next_step_handler(message, follow_user)
     except Exception as e:
         bot.reply_to(message, 'אופס, משהו השתבש.')
 
@@ -34,7 +37,7 @@ def handle_unfollow(message):
     bot.reply_to(message, "הפסקת לעקוב.")
 
 
-def has_username(username):
+def has_followrs(username):
     file_path = ('user_chat_ids.json')
     if os.path.isfile(file_path):
         with open(file_path, 'r') as infile:
@@ -45,9 +48,9 @@ def has_username(username):
 
 def save_user_chat_id(username, chat_id):
     file_path = ('user_chat_ids.json')
-    if not has_username(username):
+    if not has_followrs(username):
         new_user_chat_ids = {
-            username: {chat_id}
+            username: [chat_id]
         }
         if os.path.isfile(file_path):
             with open(file_path, 'r') as infile:
@@ -58,7 +61,7 @@ def save_user_chat_id(username, chat_id):
     else:
         with open(file_path, 'r') as infile:
             user_chat_ids = json.load(infile)
-            user_chat_ids(username).add(chat_id)
+            user_chat_ids(username).append(chat_id)
     with open(file_path, 'w') as outfile:
         json.dump(user_chat_ids, outfile)
     print(f"Data added to {file_path}")
@@ -71,9 +74,7 @@ def get_user_chat_id(username):
         return user_chat_id
 
 
-def follow_user(message):
-    username = message.text
-    chat_id = message.chat.id
+def follow_user(username,chat_id):
     save_user_chat_id(username, chat_id)
     bot.send_message(chat_id, f"אתה עכשיו עוקב אחרי {username}.")
 
@@ -83,6 +84,12 @@ def handle_start(message):
     chat_id = message.chat.id
     bot.send_message(chat_id, "/follow")
 
+
+def get_ids(username):
+    with open('user_chat_ids.json', 'r') as file:
+        user_chat_ids = json.load(file)
+        list_chat_id = user_chat_ids[username]
+        return list_chat_id
 
 def start_bot():
     bot.polling()
