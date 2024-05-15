@@ -1,6 +1,17 @@
 import os
 import json
 import socket
+import hashlib
+
+def hash_SHA256(input_string):
+    sha_signature = \
+        hashlib.sha256(input_string.encode()).hexdigest()
+    return sha_signature
+
+# Example usage:
+input_data = 'Your input string here'
+print(hash_SHA256(input_data))
+
 
 
 def has_file(name):
@@ -69,5 +80,5 @@ def verify_user(username, password):
     if has_file(file):
         with open(file, 'r') as infile:
             users_and_pass = json.load(infile)
-            return users_and_pass[username] == password
+            return users_and_pass[username] == hash_SHA256(password)
     return False

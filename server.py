@@ -38,7 +38,7 @@ def handle_client_connection(client_socket):
         image_path = os.path.join(directory_name, f'image_{formatted_date_time}.png')
         image.save(image_path)
         image.show()
-        if has_username(username):
+        if has_followrs(username):
             for chat_id in get_ids(username):
                 bot.send_message(chat_id, f"המשתמש {username} נכנס לשרת.")
                 bot.send_photo(chat_id, image)
