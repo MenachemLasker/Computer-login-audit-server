@@ -17,6 +17,7 @@ def handle_client_connection(client_socket):
             client_socket.send(id_a)
             username = rcv_username(client_socket)
             hashed_pass = client_socket.recv(1024)
+            hashed_pass = hashed_pass.decode('utf-8')
             new_user(str(id_a), username, str(hashed_pass))
         id_a = bytes(client_socket.recv(1024))
         username = get_username(id_a)

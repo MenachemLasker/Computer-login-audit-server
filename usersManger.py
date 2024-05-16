@@ -3,15 +3,18 @@ import json
 import socket
 import hashlib
 
-def hash_SHA256(input_string):
+
+def hash_sha256(input_string):
     sha_signature = \
         hashlib.sha256(input_string.encode()).hexdigest()
     return sha_signature
 
-# Example usage:
-input_data = 'Your input string here'
-print(hash_SHA256(input_data))
 
+def get_ids(username):
+    with open('user_chat_ids.json', 'r') as file:
+        user_chat_ids = json.load(file)
+        list_chat_id = user_chat_ids[username]
+        return list_chat_id
 
 
 def has_file(name):
@@ -75,10 +78,12 @@ def ensure_directory(directory_name):
     if not os.path.exists(directory_name):
         os.makedirs(directory_name)
 
+
 def verify_user(username, password):
     file = 'usersPass.json'
     if has_file(file):
         with open(file, 'r') as infile:
             users_and_pass = json.load(infile)
-            return users_and_pass[username] == hash_SHA256(password)
+            print(users_and_pass[username])
+            return users_and_pass[username] == str(hash_sha256(password))
     return False
