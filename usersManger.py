@@ -10,6 +10,16 @@ def hash_sha256(input_string):
     return sha_signature
 
 
+def has_followrs(username):
+    file_path = ('user_chat_ids.json')
+    if os.path.isfile(file_path):
+        with (open(file_path, 'r') as infile):
+            user_chat_ids = json.load(infile)
+            f = user_chat_ids.get(username) != 0
+            return f
+    return False
+
+
 def get_ids(username):
     with open('user_chat_ids.json', 'r') as file:
         user_chat_ids = json.load(file)
@@ -19,6 +29,13 @@ def get_ids(username):
 
 def has_file(name):
     return os.path.isfile(name)
+
+
+def he_follow(chat_id,username):
+    for chat_ids in get_ids(username):
+        if chat_ids == chat_id:
+            return True
+    return False
 
 
 def has_user(username):
