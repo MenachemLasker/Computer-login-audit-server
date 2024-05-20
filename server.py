@@ -6,10 +6,13 @@ import threading
 from botTelegram import *
 from PIL import Image
 from usersManger import *
-
+from rsa import *
 
 def handle_client_connection(client_socket):
     try:
+        #create_keys()
+        #public_key = load_key("public_key.pem")
+        #send_public_key(client_socket, public_key)
         char_value = client_socket.recv(1)
         have_id = char_value.decode() == '1'
         if not have_id:

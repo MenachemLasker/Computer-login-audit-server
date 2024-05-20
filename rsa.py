@@ -29,50 +29,49 @@ def create_keys():
         ))
 
 
-# פונקציה לפענוח נתונים מוצפנים
-def decrypt(encrypted_data):
-    # פענוח הנתונים באמצעות המפתח הפרטי והגדרות ה-padding
-    with open("private_key.pem", "rb") as key_file:
-        private_key = serialization.load_pem_private_key(
-            key_file.read(),
-            password=None,
-            backend=default_backend()
-        )
+def load_key(key_path):
+    with open(key_path, "rb") as f:
+        key_bytes = f.read()
 
-    original_data = private_key.decrypt(
-        encrypted_data,
-        padding.OAEP(
-            mgf=padding.MGF1(algorithm=hashes.SHA256()),
-            algorithm=hashes.SHA256(),
-            label=None
-        )
+    # פירוק המפתח הציבורי
+    key = serialization.load_key(
+        key_bytes,
+        backend=default_backend()
     )
-    return original_data
 
-# נניח ש-encrypted_data הוא המידע המוצפן שקיבלנו
-# decrypted_data = decrypt(encrypted_data)
-# print(decrypted_data)
-import socket
-from cryptography.hazmat.primitives import serialization
+    return key
+def decrypt_message(encrypted_text, private_key):
+    # פירוק המפתח הפרטי
+    private_key = serialization.load_private_key(
+        private_key,
+        password=None,
+        backend=default_backend()
+    )
 
-def send_public_key(socket, public_key_path):
-    # טעינת המפתח הציבורי מקובץ
-    with open(public_key_path, "rb") as key_file:
-        public_key = serialization.load_pem_public_key(
-            key_file.read(),
-            backend=None
-        )
+    # יצירת פונקציית פענוח
+    decryptor = private_key.decryptor()
 
-    # ייצוא המפתח הציבורי לבייטים
+    # פענוח הטקסט המוצפן
+    try:
+        decrypted_text = decryptor.update(encrypted_text) + decryptor.finalize()
+    except Exception as e:
+        print(f"שגיאה בפענוח הטקסט: {e}")
+        return None
+
+    # החזרת הטקסט המפוענח
+    return decrypted_text.decode('utf-8')
+
+# פונקציה לפענוח נתונים מוצפנים
+
+
+def send_public_key(socket, public_key):
+    # המרת המפתח הציבורי ל-bytes
     public_key_bytes = public_key.public_bytes(
         encoding=serialization.Encoding.PEM,
         format=serialization.PublicFormat.SubjectPublicKeyInfo
     )
 
-    # שליחת המפתח הציבורי דרך הסוקט
+    # שליחת אורך הנתונים
+    socket.sendall(len(public_key_bytes).to_bytes(4, 'big'))
+    # שליחת המפתח הציבורי
     socket.sendall(public_key_bytes)
-
-# דוגמה לשימוש בפונקציה:
-# s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-# s.connect(('hostname', port))
-# send_public_key(s, 'public_key.pem')
