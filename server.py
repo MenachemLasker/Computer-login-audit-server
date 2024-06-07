@@ -6,46 +6,46 @@ import threading
 from botTelegram import *
 from PIL import Image
 from usersManger import *
-from rsa import *
+
 
 def handle_client_connection(client_socket):
     try:
-        #create_keys()
-        #public_key = load_key("public_key.pem")
-        #send_public_key(client_socket, public_key)
         char_value = client_socket.recv(1)
         have_id = char_value.decode() == '1'
-        if not have_id:
+        if have_id:
+            id_a = bytes(client_socket.recv(1024))
+        if not have_id or not has_id(id_a):
             id_a = bytes([random.randint(0, 255) for _ in range(1024)])
             client_socket.send(id_a)
             username = rcv_username(client_socket)
             hashed_pass = client_socket.recv(1024)
             hashed_pass = hashed_pass.decode('utf-8')
             new_user(str(id_a), username, str(hashed_pass))
-        id_a = bytes(client_socket.recv(1024))
-        username = get_username(id_a)
-        print("hi " + username)
-        image_stream = io.BytesIO()
-        while True:
-            data = client_socket.recv(1024)
-            if not data:
-                break
-            image_stream.write(data)
+        else:
+            username = get_username(id_a)
+            print("hi " + username)
+            image_stream = io.BytesIO()
+            while True:
+                data = client_socket.recv(1024)
+                if not data:
+                    break
+                image_stream.write(data)
 
-        image_stream.seek(0)
-        image = Image.open(image_stream)
+            image_stream.seek(0)
+            image = Image.open(image_stream)
 
-        now = datetime.datetime.now()
-        formatted_date_time = now.strftime("%Y-%m-%d_%H-%M-%S")
-        directory_name = f'images_{username}'
-        ensure_directory(directory_name)
-        image_path = os.path.join(directory_name, f'image_{formatted_date_time}.png')
-        image.save(image_path)
-        image.show()
-        if has_followrs(username):
-            for chat_id in get_ids(username):
-                bot.send_message(chat_id, f"המשתמש {username} נכנס לשרת.")
-                bot.send_photo(chat_id, image)
+            now = datetime.datetime.now()
+            formatted_date_time = now.strftime("%Y-%m-%d_%H-%M-%S")
+            directory_name = f'images_{username}'
+            ensure_directory(directory_name)
+            image_path = os.path.join(directory_name, f'image_{formatted_date_time}.png')
+            image.save(image_path)
+            image.show()
+            if has_followrs(username):
+                for chat_id in get_ids(username):
+                    bot.send_message(chat_id, f"המשתמש {username} נכנס לשרת.")
+                    bot.send_photo(chat_id, image)
+
     except Exception as e:
         print(e)
         print("err")

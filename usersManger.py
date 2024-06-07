@@ -15,8 +15,8 @@ def has_followrs(username):
     if os.path.isfile(file_path):
         with (open(file_path, 'r') as infile):
             user_chat_ids = json.load(infile)
-            f = user_chat_ids.get(username) != 0
-            return f
+            f = user_chat_ids.get(username)
+            return f and f != 0
     return False
 
 
@@ -31,10 +31,11 @@ def has_file(name):
     return os.path.isfile(name)
 
 
-def he_follow(chat_id,username):
-    for chat_ids in get_ids(username):
-        if chat_ids == chat_id:
-            return True
+def he_follow(chat_id, username):
+    if has_followrs(username):
+        for chat_ids in get_ids(username):
+            if chat_ids == chat_id:
+                return True
     return False
 
 
@@ -89,6 +90,16 @@ def get_username(id_a):
         users = json.load(infile)
     username = users[str(id_a)]
     return username
+
+
+def has_id(id_a):
+    file_path = ('users.json')
+    if os.path.isfile(file_path):
+        with (open(file_path, 'r') as infile):
+            user_chat_ids = json.load(infile)
+            f = user_chat_ids.get(id_a)
+            return f and f != 0
+    return False
 
 
 def ensure_directory(directory_name):
