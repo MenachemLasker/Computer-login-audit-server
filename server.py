@@ -14,6 +14,10 @@ def handle_client_connection(client_socket):
         have_id = char_value.decode() == '1'
         if have_id:
             id_a = bytes(client_socket.recv(1024))
+            if has_id(id_a):
+                client_socket.send("0".encode())
+            else:
+                client_socket.send("1".encode())
         if not have_id or not has_id(id_a):
             id_a = bytes([random.randint(0, 255) for _ in range(1024)])
             client_socket.send(id_a)
