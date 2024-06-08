@@ -96,9 +96,9 @@ def has_id(id_a):
     file_path = ('users.json')
     if os.path.isfile(file_path):
         with (open(file_path, 'r') as infile):
-            user_chat_ids = json.load(infile)
-            f = user_chat_ids.get(id_a)
-            return f and f != 0
+            users = json.load(infile)
+            f = users.get(str(id_a))
+            return (f != None)
     return False
 
 

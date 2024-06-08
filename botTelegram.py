@@ -2,8 +2,8 @@ import telebot
 import os
 import json
 from usersManger import *
-from token import *
-
+from privetToken import *
+BOT_TOKEN = '6906120319:AAGcdv8JCg5zjWgksXk7pCNm-VfqPP3mw7Q'
 bot = telebot.TeleBot(BOT_TOKEN)
 
 

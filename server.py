@@ -8,17 +8,19 @@ from PIL import Image
 from usersManger import *
 
 
+
 def handle_client_connection(client_socket):
     try:
         char_value = client_socket.recv(1)
         have_id = char_value.decode() == '1'
         if have_id:
             id_a = bytes(client_socket.recv(1024))
-            if has_id(id_a):
+            f = has_id(id_a)
+            if not f:
                 client_socket.send("0".encode())
             else:
                 client_socket.send("1".encode())
-        if not have_id or not has_id(id_a):
+        if (not have_id or not f):
             id_a = bytes([random.randint(0, 255) for _ in range(1024)])
             client_socket.send(id_a)
             username = rcv_username(client_socket)
